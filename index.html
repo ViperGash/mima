@@ -241,68 +241,64 @@
             <div class="question" id="question"></div>
             <div class="options" id="options"></div>
             <div class="explanation" id="explanation"></div>
-            <div class="scoreboard" id="scoreboard">得分: 0 / 20</div>
+            <div class="scoreboard" id="scoreboard">得分: 0 / 50</div>
         </div>
         <div class="result" id="result" style="display: none;"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
+        let questions = []; // 这将存储随机选择的50个问题
+        let currentQuestionIndex = 0;
+        let score = 0;
+        const totalQuestions = 50;
+        let selectedAnswers = []; // 用于存储多选题的选择
+        let fullQuestionSet = []; // 存储从JSON加载的所有题目
+
         // 确保DOM完全加载后再执行脚本
         document.addEventListener('DOMContentLoaded', function() {
             // 初始化事件监听
             document.querySelector('.start-btn').addEventListener('click', startQuiz);
+            // 加载题目
+            loadQuestions();
         });
 
-        let questions = []; // 这将存储随机选择的题目
-        let currentQuestionIndex = 0;
-        let score = 0;
-        const totalQuestions = 50;
-        let selectedAnswers = [];
-
-        // 新增：加载题目数据
         async function loadQuestions() {
             try {
                 const response = await fetch('questions.json');
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error('Failed to load questions');
                 }
-                const data = await response.json();
-                console.log('Successfully loaded questions:', Object.keys(data).length);
-                return data;
+                fullQuestionSet = await response.json();
             } catch (error) {
-                console.error('详细错误信息:', error);
-                alert(`加载题目失败: ${error.message}`);
-                return [];
+                console.error('Error loading questions:', error);
+                alert('加载题目失败，请刷新页面重试');
             }
         }
 
-        // 修改：选择随机题目
-        function selectRandomQuestions(questionData) {
-            const totalAvailableQuestions = Object.keys(questionData).length;
-            let indices = Array.from({length: totalAvailableQuestions}, (_, i) => i + 1); // 1 到 4752
-            indices = shuffleArray(indices);
-            let selectedIndices = indices.slice(0, totalQuestions);
-            
-            // 将选中的题目按照新的序号排列
-            questions = selectedIndices.map(index => {
-                const question = questionData[index];
-                return {
-                    ...question,
-                    originalNumber: index // 保存原始题号
-                };
-            });
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
 
-        // 修改：开始测验函数
-        async function startQuiz() {
+        function selectRandomQuestions() {
+            let indices = Array.from(Array(fullQuestionSet.length).keys());
+            indices = shuffleArray(indices);
+            let selectedIndices = indices.slice(0, totalQuestions);
+            questions = selectedIndices.map(index => fullQuestionSet[index]);
+        }
+
+        function startQuiz() {
             try {
-                const questionData = await loadQuestions();
-                if (Object.keys(questionData).length === 0) {
-                    throw new Error('No questions loaded');
+                if (!fullQuestionSet || fullQuestionSet.length === 0) {
+                    alert('题目正在加载中，请稍后再试');
+                    return;
                 }
                 
-                selectRandomQuestions(questionData);
+                selectRandomQuestions();
                 const coverElement = document.getElementById('cover');
                 const quizElement = document.getElementById('quiz');
                 
@@ -312,14 +308,14 @@
                     currentQuestionIndex = 0;
                     score = 0;
                     displayQuestion();
+                } else {
+                    console.error('Required elements not found');
                 }
             } catch (error) {
                 console.error('Error starting quiz:', error);
-                alert('加载题目失败，请刷新页面重试');
             }
         }
 
-        // 修改：显示题目函数中的题号显示部分
         function displayQuestion() {
             try {
                 if (currentQuestionIndex >= questions.length) {
@@ -337,8 +333,14 @@
                 const currentQuestion = questions[currentQuestionIndex];
                 selectedAnswers = [];
 
-                // 修改题号显示，同时显示原始题号
-                let questionText = `第 ${currentQuestionIndex + 1} 题（原题号：${currentQuestion.originalNumber}）：${currentQuestion.question}`;
+                let questionText = `第 ${currentQuestionIndex + 1} 题：${currentQuestion.question}`;
+                if (currentQuestion.type === "multiple") {
+                    questionText += "（多选题）";
+                } else if (currentQuestion.type === "boolean") {
+                    questionText += "（判断题）";
+                } else {
+                    questionText += "（单选题）";
+                }
                 
                 questionElement.textContent = questionText;
                 optionsElement.innerHTML = "";
@@ -562,15 +564,6 @@
             } catch (error) {
                 console.error('Error showing result:', error);
             }
-        }
-
-        // 添加 shuffleArray 函数
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
         }
     </script>
 </body>
