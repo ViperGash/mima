@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>扬州大自然密评刷题小能手</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
+        
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-justify-content: center;
+            justify-content: center;
+            -webkit-align-items: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: -webkit-linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2rem 1rem;
+            border-radius: 20px;
+            -webkit-box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            margin: auto;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #3498db;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .question {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #34495e;
+            font-weight: bold;
+            padding: 0 1rem;
+        }
+        .options {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            -webkit-align-items: center;
+            align-items: center;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+        .option, .start-btn, .submit-btn, .next-btn {
+            font-size: 1.2rem;
+            padding: 0.8rem;
+            background-color: #ecf0f1;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            -webkit-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+            font-weight: bold;
+            width: 100%;
+            max-width: 300px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+        .option:hover, .start-btn:hover, .submit-btn:hover, .next-btn:hover {
+            background-color: #3498db;
+            color: white;
+            -webkit-transform: translateY(-3px);
+            transform: translateY(-3px);
+            -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .option.selected {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .option.wrong {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .submit-btn, .next-btn {
+            background-color: #2ecc71;
+            color: white;
+            margin-top: 1rem;
+        }
+        .submit-btn:disabled, .next-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .scoreboard {
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            padding: 0.8rem;
+            background-color: #34495e;
+            color: white;
+            border-radius: 10px;
+            -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .result {
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            -webkit-animation: fadeIn 1s;
+            animation: fadeIn 1s;
+        }
+        .result h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .result p {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .cover {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+            height: 100%;
+            padding: 1rem;
+        }
+        .cover-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #3498db;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .start-btn {
+            font-size: 1.3rem;
+            padding: 1rem 2rem;
+            background-color: #2ecc71;
+            color: white;
+        }
+        .start-btn:hover {
+            background-color: #27ae60;
+        }
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        @-webkit-keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @-webkit-keyframes shake {
+            0% { -webkit-transform: translate(1px, 1px) rotate(0deg); }
+            10% { -webkit-transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { -webkit-transform: translate(-3px, 0px) rotate(1deg); }
+            30% { -webkit-transform: translate(3px, 2px) rotate(0deg); }
+            40% { -webkit-transform: translate(1px, -1px) rotate(1deg); }
+            50% { -webkit-transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { -webkit-transform: translate(-3px, 1px) rotate(0deg); }
+            70% { -webkit-transform: translate(3px, 1px) rotate(-1deg); }
+            80% { -webkit-transform: translate(-1px, -1px) rotate(1deg); }
+            90% { -webkit-transform: translate(1px, 2px) rotate(0deg); }
+            100% { -webkit-transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake {
+            -webkit-animation: shake 0.5s;
+            animation: shake 0.5s;
+            -webkit-animation-iteration-count: 1;
+            animation-iteration-count: 1;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            h1, .cover-title {
+                font-size: 1.8rem;
+            }
+            .question {
+                font-size: 1.3rem;
+            }
+            .option, .start-btn, .submit-btn, .next-btn {
+                font-size: 1.1rem;
+                padding: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="cover" class="cover">
+            <h1 class="cover-title">扬州大自然密评刷题小能手</h1>
+            <button class="start-btn" type="button" onclick="startQuiz()">开始回答</button>
+        </div>
+        <div id="quiz" style="display: none;">
+            <h1>网络安全知识竞答</h1>
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="explanation" id="explanation"></div>
+            <div class="scoreboard" id="scoreboard">得分: 0 / 20</div>
+        </div>
+        <div class="result" id="result" style="display: none;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        // 确保DOM完全加载后再执行脚本
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化事件监听
+            document.querySelector('.start-btn').addEventListener('click', startQuiz);
+        });
+
+        let questions = []; // 这将存储随机选择的题目
+        let currentQuestionIndex = 0;
+        let score = 0;
+        const totalQuestions = 50;
+        let selectedAnswers = [];
+
+        // 新增：加载题目数据
+        async function loadQuestions() {
+            try {
+                const response = await fetch('numbered_questions.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('Successfully loaded questions:', Object.keys(data).length);
+                return data;
+            } catch (error) {
+                console.error('详细错误信息:', error);
+                alert(`加载题目失败: ${error.message}`);
+                return [];
+            }
+        }
+
+        // 修改：选择随机题目
+        function selectRandomQuestions(questionData) {
+            const totalAvailableQuestions = Object.keys(questionData).length;
+            let indices = Array.from({length: totalAvailableQuestions}, (_, i) => i + 1); // 1 到 4752
+            indices = shuffleArray(indices);
+            let selectedIndices = indices.slice(0, totalQuestions);
+            
+            // 将选中的题目按照新的序号排列
+            questions = selectedIndices.map(index => {
+                const question = questionData[index];
+                return {
+                    ...question,
+                    originalNumber: index // 保存原始题号
+                };
+            });
+        }
+
+        // 修改：开始测验函数
+        async function startQuiz() {
+            try {
+                const questionData = await loadQuestions();
+                if (Object.keys(questionData).length === 0) {
+                    throw new Error('No questions loaded');
+                }
+                
+                selectRandomQuestions(questionData);
+                const coverElement = document.getElementById('cover');
+                const quizElement = document.getElementById('quiz');
+                
+                if (coverElement && quizElement) {
+                    coverElement.style.display = 'none';
+                    quizElement.style.display = 'block';
+                    currentQuestionIndex = 0;
+                    score = 0;
+                    displayQuestion();
+                }
+            } catch (error) {
+                console.error('Error starting quiz:', error);
+                alert('加载题目失败，请刷新页面重试');
+            }
+        }
+
+        // 修改：显示题目函数中的题号显示部分
+        function displayQuestion() {
+            try {
+                if (currentQuestionIndex >= questions.length) {
+                    showResult();
+                    return;
+                }
+
+                const questionElement = document.getElementById("question");
+                const optionsElement = document.getElementById("options");
+                
+                if (!questionElement || !optionsElement) {
+                    throw new Error('Required elements not found');
+                }
+
+                const currentQuestion = questions[currentQuestionIndex];
+                selectedAnswers = [];
+
+                // 修改题号显示，同时显示原始题号
+                let questionText = `第 ${currentQuestionIndex + 1} 题（原题号：${currentQuestion.originalNumber}）：${currentQuestion.question}`;
+                
+                questionElement.textContent = questionText;
+                optionsElement.innerHTML = "";
+
+                currentQuestion.options.forEach((option, index) => {
+                    const button = document.createElement("button");
+                    button.type = "button"; // 明确指定按钮类型
+                    button.classList.add("option");
+                    button.textContent = option;
+                    
+                    if (currentQuestion.type === "multiple") {
+                        button.addEventListener("click", () => toggleMultipleChoice(index));
+                    } else {
+                        button.addEventListener("click", () => selectOption(index));
+                    }
+                    
+                    optionsElement.appendChild(button);
+                });
+
+                if (currentQuestion.type === "multiple") {
+                    const submitButton = document.createElement("button");
+                    submitButton.type = "button";
+                    submitButton.textContent = "提交答案";
+                    submitButton.classList.add("submit-btn");
+                    submitButton.addEventListener("click", submitMultipleChoice);
+                    optionsElement.appendChild(submitButton);
+                }
+                
+                updateScoreboard();
+                hideExplanation();
+            } catch (error) {
+                console.error('Error displaying question:', error);
+            }
+        }
+
+        function selectOption(index) {
+            try {
+                const currentQuestion = questions[currentQuestionIndex];
+                const options = document.querySelectorAll(".option");
+                
+                if (currentQuestion.type !== "multiple") {
+                    options.forEach(option => option.disabled = true);
+                    options[index].classList.add("selected");
+
+                    if (index === currentQuestion.correctAnswer) {
+                        score++;
+                        options[index].style.backgroundColor = "#2ecc71";
+                        if (window.confetti) {
+                            confetti({
+                                particleCount: 100,
+                                spread: 70,
+                                origin: { y: 0.6 }
+                            });
+                        }
+                    } else {
+                        options[index].classList.add("wrong");
+                        options[currentQuestion.correctAnswer].style.backgroundColor = "#2ecc71";
+                        document.body.classList.add("shake");
+                        setTimeout(() => {
+                            document.body.classList.remove("shake");
+                        }, 500);
+                    }
+                    
+                    showExplanation(currentQuestion.explanation);
+                    updateScoreboard();
+                    
+                    const nextButton = document.createElement("button");
+                    nextButton.type = "button";
+                    nextButton.textContent = "下一题";
+                    nextButton.classList.add("next-btn");
+                    nextButton.addEventListener("click", () => {
+                        currentQuestionIndex++;
+                        displayQuestion();
+                    });
+                    document.getElementById("options").appendChild(nextButton);
+                }
+            } catch (error) {
+                console.error('Error selecting option:', error);
+            }
+        }
+
+        function toggleMultipleChoice(index) {
+            try {
+                const button = document.querySelectorAll(".option")[index];
+                const isSelected = selectedAnswers.includes(index);
+                
+                if (isSelected) {
+                    selectedAnswers = selectedAnswers.filter(i => i !== index);
+                    button.style.backgroundColor = "#ecf0f1";
+                } else {
+                    selectedAnswers.push(index);
+                    button.style.backgroundColor = "#3498db";
+                }
+            } catch (error) {
+                console.error('Error toggling multiple choice:', error);
+            }
+        }
+
+        function submitMultipleChoice() {
+            try {
+                const currentQuestion = questions[currentQuestionIndex];
+                const options = document.querySelectorAll(".option");
+                const submitBtn = document.querySelector(".submit-btn");
+                
+                submitBtn.disabled = true;
+                options.forEach(option => option.disabled = true);
+                
+                const isCorrect = arraysEqual(selectedAnswers.sort(), currentQuestion.correctAnswer.sort());
+                
+                if (isCorrect) {
+                    score++;
+                    selectedAnswers.forEach(index => {
+                        options[index].style.backgroundColor = "#2ecc71";
+                    });
+                    if (window.confetti) {
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                    }
+                } else {
+                    selectedAnswers.forEach(index => {
+                        if (!currentQuestion.correctAnswer.includes(index)) {
+                            options[index].style.backgroundColor = "#e74c3c";
+                        }
+                    });
+                    currentQuestion.correctAnswer.forEach(index => {
+                        options[index].style.backgroundColor = "#2ecc71";
+                    });
+                    document.body.classList.add("shake");
+                    setTimeout(() => {
+                        document.body.classList.remove("shake");
+                    }, 500);
+                }
+
+                showExplanation(currentQuestion.explanation);
+                updateScoreboard();
+                
+                const nextButton = document.createElement("button");
+                nextButton.type = "button";
+                nextButton.textContent = "下一题";
+                nextButton.classList.add("next-btn");
+                nextButton.addEventListener("click", () => {
+                    selectedAnswers = [];
+                    currentQuestionIndex++;
+                    displayQuestion();
+                });
+                document.getElementById("options").appendChild(nextButton);
+            } catch (error) {
+                console.error('Error submitting multiple choice:', error);
+            }
+        }
+
+        function updateScoreboard() {
+            try {
+                const scoreboardElement = document.getElementById("scoreboard");
+                if (scoreboardElement) {
+                    scoreboardElement.textContent = `得分: ${score} / ${totalQuestions}`;
+                }
+            } catch (error) {
+                console.error('Error updating scoreboard:', error);
+            }
+        }
+
+        function showExplanation(explanation) {
+            try {
+                const explanationElement = document.getElementById("explanation");
+                if (explanationElement) {
+                    explanationElement.textContent = explanation || "暂无解析";
+                    explanationElement.style.display = "block";
+                }
+            } catch (error) {
+                console.error('Error showing explanation:', error);
+            }
+        }
+
+        function hideExplanation() {
+            try {
+                const explanationElement = document.getElementById("explanation");
+                if (explanationElement) {
+                    explanationElement.style.display = "none";
+                }
+            } catch (error) {
+                console.error('Error hiding explanation:', error);
+            }
+        }
+
+        function arraysEqual(a, b) {
+            if (!Array.isArray(a) || !Array.isArray(b)) return false;
+            if (a.length !== b.length) return false;
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        }
+
+        function showResult() {
+            try {
+                const quizElement = document.getElementById("quiz");
+                const resultElement = document.getElementById("result");
+
+                if (quizElement && resultElement) {
+                    quizElement.style.display = "none";
+                    resultElement.style.display = "block";
+
+                    resultElement.innerHTML = `
+                        <h2>竞答结束！</h2>
+                        <p>你的最终得分是：${score} / ${totalQuestions}</p>
+                    `;
+
+                    if (window.confetti) {
+                        confetti({
+                            particleCount: 200,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            duration: 3000
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error showing result:', error);
+            }
+        }
+
+        // 添加 shuffleArray 函数
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
